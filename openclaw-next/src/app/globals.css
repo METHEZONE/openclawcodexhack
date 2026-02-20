@@ -1,0 +1,54 @@
+@import 'tailwindcss';
+
+:root {
+  --background: #030714;
+  --foreground: #eef3ff;
+  --panel: #0c1126;
+  --card: #0f1634;
+  --accent: #f7b500;
+  --accent-2: #54d6ff;
+  --accent-3: #9ef27c;
+  --grid: rgba(255, 255, 255, 0.04);
+  --glow: 0 0 35px rgba(84, 214, 255, 0.35);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-arcade);
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(84, 214, 255, 0.12), transparent 35%),
+    radial-gradient(circle at 80% 10%, rgba(247, 181, 0, 0.1), transparent 25%),
+    radial-gradient(circle at 50% 80%, rgba(158, 242, 124, 0.12), transparent 30%),
+    linear-gradient(135deg, #050b1c 0%, #070f24 40%, #060b1a 100%);
+  color: var(--foreground);
+  font-family: var(--font-sans), 'Chakra Petch', sans-serif;
+  position: relative;
+}
+
+.grid-overlay {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(0deg, transparent 96%, var(--grid) 100%),
+    linear-gradient(90deg, transparent 96%, var(--grid) 100%);
+  background-size: 40px 40px;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.neon-border {
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.05),
+    0 0 25px rgba(84, 214, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.title-pixel {
+  font-family: var(--font-arcade), 'Press Start 2P', monospace;
+  letter-spacing: 0.05em;
+}

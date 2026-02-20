@@ -1,0 +1,16 @@
+# Node / build artifacts
+node_modules
+.next
+out
+dist
+.turbo
+.cache
+*.log
+.DS_Store
+
+# Env
+.env*
+
+# Editor
+.vscode
+.idea
