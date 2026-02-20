@@ -68,16 +68,47 @@ export default function AgentsPage() {
   const [model, setModel] = useState('gpt-4.1')
   const [showToast, setShowToast] = useState(false)
   const [showAllSkills, setShowAllSkills] = useState(false)
+  const [deploying, setDeploying] = useState(false)
+  const [progress, setProgress] = useState('Idle')
+  const [lastResult, setLastResult] = useState('No deploys yet')
   const router = useRouter()
 
   const skillLine = useMemo(() => selected.skills.join(' • '), [selected])
   const primarySkills = selected.skills.slice(0, 4)
   const remaining = Math.max(selected.skills.length - primarySkills.length, 0)
 
-  const handleDeploy = () => {
-    setShowToast(true)
-    setTimeout(() => setShowToast(false), 2000)
-    setTimeout(() => router.push('/agents/live'), 1200)
+  const runDeploy = async (mode: 'mock' | 'real') => {
+    setDeploying(true)
+    setShowToast(false)
+    setProgress(mode === 'real' ? 'Calling deploy API…' : 'Mocking deployment…')
+    setLastResult('Working…')
+
+    try {
+      const res = await fetch('/api/deploy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          agentId: selected.id,
+          skills: selected.skills,
+          apiBase: mode === 'real' ? apiBase : '',
+          apiKey: mode === 'real' ? apiKey : '',
+          model
+        })
+      })
+      const data = await res.json()
+      const modeReturned = (data.mode as 'mock' | 'real') || mode
+      if (!res.ok || data?.ok === false) throw new Error(data?.error || `Deploy failed (${res.status})`)
+      setProgress(modeReturned === 'mock' ? 'Mock deploy complete' : 'API deploy complete')
+      setLastResult(modeReturned === 'mock' ? 'Mock run succeeded' : 'Live API call succeeded')
+    } catch (e) {
+      setProgress('Error (showing live view anyway)')
+      setLastResult('Deploy failed · continuing to live demo view')
+    } finally {
+      setDeploying(false)
+      setShowToast(true)
+      setTimeout(() => setShowToast(false), 2200)
+      setTimeout(() => router.push('/agents/live'), 1200)
+    }
   }
 
   return (
@@ -173,6 +204,7 @@ export default function AgentsPage() {
                 placeholder='https://api.your-stack.com'
                 className='input'
               />
+              <p className='text-[11px] text-slate-500'>Leave blank to run a safe mock deploy.</p>
             </div>
             <div className='flex flex-col gap-1'>
               <label className='text-xs uppercase tracking-wide text-slate-500'>API key</label>
@@ -193,15 +225,41 @@ export default function AgentsPage() {
                 className='input'
               />
             </div>
-            <button type='button' className='pill solid w-full justify-center text-center' onClick={handleDeploy}>
-              Deploy this agent
-            </button>
+            <div className='grid gap-2 sm:grid-cols-2'>
+              <button
+                type='button'
+                className='pill solid w-full justify-center text-center'
+                onClick={() => runDeploy('real')}
+                disabled={deploying}
+              >
+                {deploying ? 'Deploying…' : 'Deploy with API'}
+              </button>
+              <button
+                type='button'
+                className='pill ghost w-full justify-center text-center text-slate-700'
+                onClick={() => runDeploy('mock')}
+                disabled={deploying}
+              >
+                Mock deploy (sandbox)
+              </button>
+            </div>
+            <p className='text-[11px] text-slate-500'>
+              Both buttons will still move you to the live stage so you can show the running agents.
+            </p>
           </form>
+
+          <div className='mt-5 rounded-2xl border border-slate-200/80 bg-white/70 p-4 text-sm text-slate-700 shadow-soft'>
+            <p className='text-xs uppercase tracking-wide text-slate-500'>Deploy status</p>
+            <p className='mt-1 font-semibold text-slate-900'>
+              {deploying ? progress : 'Idle · ready to deploy'}
+            </p>
+            <p className='mt-1 text-xs text-slate-600'>Last result: {lastResult}</p>
+          </div>
         </section>
       </main>
 
       {showToast ? (
-        <div className='fixed top-4 left-1/2 z-50 -translate-x-1/2 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-soft'>
+        <div className='toast'>
           {selected.name} deployed (demo)
         </div>
       ) : null}
