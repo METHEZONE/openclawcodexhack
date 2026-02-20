@@ -15,8 +15,8 @@ const arcade = Press_Start_2P({
 })
 
 export const metadata: Metadata = {
-  title: 'OpenClaw Arcade',
-  description: 'Mac-friendly, game-like agent launcher built for Hack Night'
+  title: 'Mycelia',
+  description: 'A playful, guided stage for soulful agents'
 }
 
 export default function RootLayout({

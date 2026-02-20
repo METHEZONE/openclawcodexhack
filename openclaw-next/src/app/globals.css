@@ -21,14 +21,17 @@
 
 body {
   min-height: 100vh;
-  background:
-    radial-gradient(circle at 20% 20%, rgba(84, 214, 255, 0.12), transparent 35%),
-    radial-gradient(circle at 80% 10%, rgba(247, 181, 0, 0.1), transparent 25%),
-    radial-gradient(circle at 50% 80%, rgba(158, 242, 124, 0.12), transparent 30%),
-    linear-gradient(135deg, #050b1c 0%, #070f24 40%, #060b1a 100%);
-  color: var(--foreground);
+  background: #f8fafc;
+  color: #0b0c0f;
   font-family: var(--font-sans), 'Chakra Petch', sans-serif;
   position: relative;
+}
+
+.surface-light {
+  background: radial-gradient(circle at 30% 10%, rgba(84, 214, 255, 0.12), transparent 40%),
+    radial-gradient(circle at 90% 0%, rgba(247, 181, 0, 0.12), transparent 35%),
+    linear-gradient(180deg, #f9fbff 0%, #f3f7ff 45%, #eef3ff 100%);
+  color: #0b0c0f;
 }
 
 .grid-overlay {
@@ -51,4 +54,360 @@ body {
 .title-pixel {
   font-family: var(--font-arcade), 'Press Start 2P', monospace;
   letter-spacing: 0.05em;
+}
+
+.soul-orb {
+  position: relative;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.25), transparent 40%),
+    radial-gradient(circle at 70% 70%, rgba(255, 200, 120, 0.35), transparent 45%),
+    radial-gradient(circle at 50% 50%, rgba(70, 150, 255, 0.35), transparent 50%),
+    radial-gradient(circle at 40% 60%, rgba(140, 255, 200, 0.35), transparent 55%),
+    radial-gradient(circle at 60% 40%, rgba(255, 120, 180, 0.3), transparent 55%),
+    #0a1024;
+  box-shadow:
+    0 0 30px rgba(84, 214, 255, 0.25),
+    inset 0 0 25px rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+  animation: pulse 10s ease-in-out infinite, hue 26s linear infinite;
+}
+
+.soul-orb::after {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.14) 0%, transparent 40%),
+    conic-gradient(
+      from 90deg,
+      rgba(255, 255, 255, 0.05),
+      rgba(84, 214, 255, 0.2),
+      rgba(255, 181, 0, 0.2),
+      rgba(255, 255, 255, 0.05)
+    );
+  mix-blend-mode: screen;
+  filter: blur(10px);
+  animation: swirl 12s linear infinite;
+}
+
+.soul-trail {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.35) 0, transparent 50%);
+  background-size: 140px 140px;
+  animation: drift 14s linear infinite;
+  opacity: 0.35;
+  mix-blend-mode: screen;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow:
+      0 0 28px rgba(84, 214, 255, 0.25),
+      inset 0 0 25px rgba(255, 255, 255, 0.06);
+  }
+  50% {
+    transform: scale(1.06);
+    box-shadow:
+      0 0 38px rgba(247, 181, 0, 0.28),
+      inset 0 0 30px rgba(255, 255, 255, 0.12);
+  }
+}
+
+@keyframes hue {
+  0% {
+    filter: hue-rotate(0deg);
+  }
+  100% {
+    filter: hue-rotate(360deg);
+  }
+}
+
+@keyframes swirl {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  100% {
+    transform: rotate(360deg) scale(1.02);
+  }
+}
+
+@keyframes drift {
+  0% {
+    background-position: 0 0, 80px 120px;
+  }
+  50% {
+    background-position: 120px 160px, 0 60px;
+  }
+  100% {
+    background-position: 0 0, 80px 120px;
+  }
+}
+
+/* Loader orb */
+.loader-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 180px;
+  height: 180px;
+  font-family: 'Inter', sans-serif;
+  font-size: 1.2em;
+  font-weight: 300;
+  color: white;
+  border-radius: 50%;
+  background-color: transparent;
+  user-select: none;
+}
+
+.loader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background-color: transparent;
+  animation: loader-rotate 6s linear infinite;
+  z-index: 0;
+  --c1: #fff;
+  --c2: #ad5fff;
+  --c3: #471eec;
+  --c4: #d60a47;
+  --c5: #311e80;
+}
+
+@keyframes loader-rotate {
+  0% {
+    transform: rotate(90deg);
+    box-shadow: 0 10px 20px 0 var(--c1) inset, 0 20px 30px 0 var(--c2) inset,
+      0 60px 60px 0 var(--c3) inset;
+  }
+  50% {
+    transform: rotate(270deg);
+    box-shadow: 0 10px 20px 0 var(--c1) inset, 0 20px 10px 0 var(--c4) inset,
+      0 40px 60px 0 var(--c5) inset;
+  }
+  100% {
+    transform: rotate(450deg);
+    box-shadow: 0 10px 20px 0 var(--c1) inset, 0 20px 30px 0 var(--c2) inset,
+      0 60px 60px 0 var(--c3) inset;
+  }
+}
+
+.loader-letter {
+  display: inline-block;
+  opacity: 0.4;
+  transform: translateY(0);
+  animation: loader-letter-anim 3.2s infinite;
+  z-index: 1;
+  border-radius: 50ch;
+  border: none;
+}
+
+.loader-letter:nth-child(1) {
+  animation-delay: 0s;
+}
+.loader-letter:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.loader-letter:nth-child(3) {
+  animation-delay: 0.2s;
+}
+.loader-letter:nth-child(4) {
+  animation-delay: 0.3s;
+}
+.loader-letter:nth-child(5) {
+  animation-delay: 0.4s;
+}
+.loader-letter:nth-child(6) {
+  animation-delay: 0.5s;
+}
+.loader-letter:nth-child(7) {
+  animation-delay: 0.6s;
+}
+.loader-letter:nth-child(8) {
+  animation-delay: 0.7s;
+}
+.loader-letter:nth-child(9) {
+  animation-delay: 0.8s;
+}
+.loader-letter:nth-child(10) {
+  animation-delay: 0.9s;
+}
+
+@keyframes loader-letter-anim {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: translateY(0);
+  }
+  20% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+  40% {
+    opacity: 0.7;
+    transform: translateY(0);
+  }
+}
+
+.pill {
+  padding: 0.85rem 1.4rem;
+  border-radius: 999px;
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.pill.solid {
+  background: linear-gradient(135deg, #0f172a, #111827);
+  color: #f8fafc;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.25);
+}
+
+.pill.solid:hover {
+  transform: translateY(-2px);
+}
+
+.pill.outline {
+  border: 1px solid rgba(15, 23, 42, 0.18);
+  color: #0b0c0f;
+  background: #ffffffc7;
+}
+
+.pill.ghost {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  color: #334155;
+  background: #ffffffb3;
+}
+
+.input {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  background: #fff;
+  padding: 0.8rem 0.9rem;
+  font-size: 0.95rem;
+  color: #0b0c0f;
+  outline: none;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input:focus {
+  border-color: rgba(15, 23, 42, 0.35);
+  box-shadow: 0 0 0 3px rgba(84, 214, 255, 0.2);
+}
+
+.shadow-soft {
+  box-shadow: 0 15px 40px rgba(15, 23, 42, 0.12);
+}
+
+.bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(2px);
+  opacity: 0.9;
+  background-size: 120% 120%;
+  background-position: center;
+}
+
+.orb-left {
+  width: 28vw;
+  height: 28vw;
+  left: -12vw;
+  top: 10vh;
+  background: radial-gradient(circle at 40% 40%, #233748, #0f172a 60%);
+}
+
+.orb-right {
+  width: 24vw;
+  height: 24vw;
+  right: -10vw;
+  bottom: -4vh;
+  background: radial-gradient(circle at 50% 50%, #f7b500, #bf360c 60%);
+}
+
+.orb-top {
+  width: 18vw;
+  height: 18vw;
+  right: 20vw;
+  top: 4vh;
+  background: radial-gradient(circle at 50% 50%, #233748, #0b1022 60%);
+  opacity: 0.65;
+}
+
+/* Rippling hole background */
+.hole {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.hole i {
+  display: block;
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  border-radius: 140px;
+  opacity: 0;
+  animation-name: ripple-scale;
+  animation-duration: 5.5s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.35), transparent 70%);
+}
+
+.hole i:nth-child(1) {
+  animation-delay: 0.3s;
+}
+.hole i:nth-child(2) {
+  animation-delay: 0.6s;
+}
+.hole i:nth-child(3) {
+  animation-delay: 0.9s;
+}
+.hole i:nth-child(4) {
+  animation-delay: 1.2s;
+}
+.hole i:nth-child(5) {
+  animation-delay: 1.5s;
+}
+.hole i:nth-child(6) {
+  animation-delay: 1.8s;
+}
+.hole i:nth-child(7) {
+  animation-delay: 2.1s;
+}
+.hole i:nth-child(8) {
+  animation-delay: 2.4s;
+}
+.hole i:nth-child(9) {
+  animation-delay: 2.7s;
+}
+.hole i:nth-child(10) {
+  animation-delay: 3s;
+}
+
+@keyframes ripple-scale {
+  0% {
+    transform: scale(2);
+    opacity: 0;
+    box-shadow: 0 0 50px rgba(255, 255, 255, 0.5);
+  }
+  50% {
+    transform: scale(1) translate(0px, -5px);
+    opacity: 1;
+    box-shadow: 0 8px 20px rgba(255, 255, 255, 0.5);
+  }
+  100% {
+    transform: scale(0.1) translate(0px, 5px);
+    opacity: 0;
+    box-shadow: 0 10px 20px rgba(255, 255, 255, 0);
+  }
 }
