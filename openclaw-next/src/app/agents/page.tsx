@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 type Agent = {
@@ -72,6 +72,27 @@ export default function AgentsPage() {
   const [progress, setProgress] = useState('Idle')
   const [lastResult, setLastResult] = useState('No deploys yet')
   const router = useRouter()
+  const audioRef = useRef<AudioContext | null>(null)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    audioRef.current = new (window.AudioContext || (window as any).webkitAudioContext)()
+  }, [])
+
+  const playSelect = () => {
+    const ctx = audioRef.current
+    if (!ctx) return
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.type = 'sine'
+    osc.frequency.value = 520
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.08, ctx.currentTime + 0.01)
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.18)
+    osc.connect(gain).connect(ctx.destination)
+    osc.start()
+    osc.stop(ctx.currentTime + 0.2)
+  }
 
   const skillLine = useMemo(() => selected.skills.join(' • '), [selected])
   const primarySkills = selected.skills.slice(0, 4)
@@ -133,7 +154,10 @@ export default function AgentsPage() {
             {agents.map(agent => (
               <button
                 key={agent.id}
-                onClick={() => setSelected(agent)}
+                onClick={() => {
+                  setSelected(agent)
+                  playSelect()
+                }}
                 className={`group relative overflow-hidden rounded-2xl border border-slate-200/70 bg-white/70 p-4 text-left transition hover:-translate-y-0.5 hover:shadow-soft ${
                   selected.id === agent.id ? 'ring-2 ring-slate-900/60' : ''
                 }`}

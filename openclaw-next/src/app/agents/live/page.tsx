@@ -15,6 +15,13 @@ type ChatItem = {
   at?: string
 }
 
+type ChatMessage = {
+  role: 'user' | 'agent'
+  text: string
+  from: string
+  at: string
+}
+
 const working = [
   {
     name: 'Amber Scout',
@@ -63,6 +70,10 @@ export default function LiveAgents() {
   const [tick, setTick] = useState(0)
   const [history, setHistory] = useState<HistoryItem[]>(historySeeds)
   const [chat, setChat] = useState<ChatItem[]>(chatSeeds)
+  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [input, setInput] = useState('')
+  const [chatAgent, setChatAgent] = useState(working[0].name)
+  const [chatBusy, setChatBusy] = useState(false)
 
   useEffect(() => {
     const id = setInterval(() => setTick(t => t + 1), 2200)
@@ -85,6 +96,37 @@ export default function LiveAgents() {
     }, 3600)
     return () => clearInterval(id)
   }, [history.length, chat.length])
+
+  const sendChat = async () => {
+    const trimmed = input.trim()
+    if (!trimmed) return
+    const stamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    const userMsg: ChatMessage = { role: 'user', text: trimmed, from: 'You', at: stamp }
+    setMessages(m => [...m, userMsg])
+    setInput('')
+    setChatBusy(true)
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ agent: chatAgent, message: trimmed })
+      })
+      const data = await res.json()
+      const replyText = data?.reply || 'No reply'
+      const reply: ChatMessage = { role: 'agent', text: replyText, from: chatAgent, at: stamp }
+      setMessages(m => [...m, reply])
+    } catch (e) {
+      const fail: ChatMessage = {
+        role: 'agent',
+        text: 'Failed to reach chat API (demo continues).',
+        from: chatAgent,
+        at: stamp
+      }
+      setMessages(m => [...m, fail])
+    } finally {
+      setChatBusy(false)
+    }
+  }
 
   return (
     <div className='relative min-h-screen overflow-hidden surface-light px-6 pb-16 md:px-10'>
@@ -192,6 +234,68 @@ export default function LiveAgents() {
                 <div className='text-slate-700'>{msg.text}</div>
               </div>
             ))}
+          </div>
+          <div className='mt-4 border-t border-slate-200 pt-3'>
+            <div className='mb-2 flex items-center justify-between'>
+              <label className='text-xs font-semibold text-slate-600'>Talk to an agent</label>
+              <select
+                value={chatAgent}
+                onChange={e => setChatAgent(e.target.value)}
+                className='rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700'
+              >
+                {working.map(a => (
+                  <option key={a.name}>{a.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className='flex flex-col gap-2'>
+              <div className='max-h-44 overflow-y-auto rounded-xl border border-slate-200 bg-slate-50/70 p-3 text-sm text-slate-800'>
+                {messages.length === 0 ? (
+                  <div className='text-xs text-slate-500'>Say hi—demo will reply even without an API key.</div>
+                ) : (
+                  messages.map((m, i) => (
+                    <div key={i} className='mb-2'>
+                      <div className='flex items-center justify-between text-[11px] text-slate-500'>
+                        <span>{m.from}</span>
+                        <span>{m.at}</span>
+                      </div>
+                      <div
+                        className={`rounded-lg px-3 py-2 ${
+                          m.role === 'user' ? 'bg-white' : 'bg-emerald-50'
+                        }`}
+                      >
+                        {m.text}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+              <div className='flex gap-2'>
+                <input
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                  placeholder='Ask this orb anything...'
+                  className='flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-slate-400'
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      sendChat()
+                    }
+                  }}
+                />
+                <button
+                  type='button'
+                  className='pill solid px-4 text-sm'
+                  onClick={sendChat}
+                  disabled={chatBusy}
+                >
+                  {chatBusy ? 'Talking…' : 'Send'}
+                </button>
+              </div>
+              <p className='text-[11px] text-slate-500'>
+                Uses OpenAI if `OPENAI_API_KEY` is set; otherwise replies in demo mode.
+              </p>
+            </div>
           </div>
         </div>
       </section>
