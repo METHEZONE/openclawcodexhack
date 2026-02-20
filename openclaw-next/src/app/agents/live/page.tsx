@@ -3,9 +3,33 @@
 import { useEffect, useState } from 'react'
 
 const working = [
-  { name: 'Amber Scout', status: 'Scraping ICP signals', color: '#f7b500' },
-  { name: 'Rose Writer', status: 'Drafting outreach v2', color: '#ff4f84' },
-  { name: 'Cyan Surfer', status: 'Summarizing docs', color: '#54d6ff' }
+  {
+    name: 'Amber Scout',
+    color: '#f7b500',
+    jobs: [
+      { title: 'ab-test-setup', status: 'running' },
+      { title: 'lead-hunt: fintech ICP', status: 'queued' },
+      { title: 'offer-grid refresh', status: 'done' }
+    ]
+  },
+  {
+    name: 'Rose Writer',
+    color: '#ff4f84',
+    jobs: [
+      { title: 'persona-weave draft', status: 'running' },
+      { title: 'subject-variants x6', status: 'queued' },
+      { title: 'tone-shift review', status: 'done' }
+    ]
+  },
+  {
+    name: 'Cyan Surfer',
+    color: '#54d6ff',
+    jobs: [
+      { title: 'scrape + summarize (docs)', status: 'running' },
+      { title: 'cite block build', status: 'queued' },
+      { title: 'quote-extract cleanup', status: 'done' }
+    ]
+  }
 ]
 
 export default function LiveAgents() {
@@ -41,7 +65,27 @@ export default function LiveAgents() {
                 <p className='text-base font-semibold text-slate-900'>{agent.name}</p>
               </div>
             </div>
-            <div className='mt-3 text-sm text-slate-700'>{agent.status}</div>
+            <div className='mt-3 text-sm text-slate-700'>
+              Current job: {agent.jobs[tick % agent.jobs.length].title}
+            </div>
+            <div className='mt-2 space-y-1'>
+              {agent.jobs.map(job => (
+                <div key={job.title} className='flex items-center justify-between text-xs text-slate-600'>
+                  <span>{job.title}</span>
+                  <span
+                    className={`rounded-full px-2 py-0.5 font-semibold capitalize ${
+                      job.status === 'running'
+                        ? 'bg-emerald-100 text-emerald-700'
+                        : job.status === 'queued'
+                          ? 'bg-amber-100 text-amber-700'
+                          : 'bg-slate-200 text-slate-700'
+                    }`}
+                  >
+                    {job.status}
+                  </span>
+                </div>
+              ))}
+            </div>
             <div className='mt-3 flex items-center gap-2 text-xs text-slate-500'>
               <span className='h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.6)]' />
               Live · tick {tick + idx}
