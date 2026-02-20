@@ -1,6 +1,8 @@
 'use client'
 
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import type { CSSProperties } from 'react'
 
 type Palette = {
   name: string
@@ -22,6 +24,28 @@ const palette: Palette = {
 }
 
 export default function Home() {
+  const [statuses, setStatuses] = useState<string[]>([])
+  const [loadingStatuses, setLoadingStatuses] = useState(true)
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await fetch('/api/clawgent', { cache: 'no-store' })
+        const data = await res.json()
+        if (Array.isArray(data?.items) && data.items.length) {
+          setStatuses(data.items)
+        } else {
+          setStatuses(['Amber Scout · running', 'Rose Writer · queued', 'Cyan Surfer · done'])
+        }
+      } catch {
+        setStatuses(['Amber Scout · running', 'Rose Writer · queued', 'Cyan Surfer · done'])
+      } finally {
+        setLoadingStatuses(false)
+      }
+    }
+    load()
+  }, [])
+
   return (
     <div className='relative min-h-screen overflow-hidden surface-light'>
       <div className='bg-orb orb-left' />
@@ -56,7 +80,7 @@ export default function Home() {
                   {
                     background: `radial-gradient(circle, ${palette.c2}55, transparent 70%)`,
                     boxShadow: '0 0 50px rgba(255,255,255,0.35)'
-                  } as React.CSSProperties
+                  } as CSSProperties
                 }
               />
             ))}
@@ -71,7 +95,7 @@ export default function Home() {
                   '--c3': palette.c3,
                   '--c4': palette.c4,
                   '--c5': palette.c5
-                } as React.CSSProperties
+                } as CSSProperties
               }
             />
             {'generating'.split('').map((l, i) => (
@@ -85,8 +109,40 @@ export default function Home() {
 
         <div className='flex flex-wrap justify-center gap-3'>
           <Link href='/agents' className='pill solid'>
-            Enter Mycelia
+            Deploy Mycelia
           </Link>
+          <a
+            href='https://clawgent.ai/i/1696942f8044e9675e45c326/agents'
+            target='_blank'
+            rel='noreferrer'
+            className='pill ghost'
+          >
+            View dashboard
+          </a>
+        </div>
+
+        <div className='mt-6 w-full max-w-3xl rounded-3xl border border-slate-200/80 bg-white/85 p-4 text-left shadow-soft backdrop-blur'>
+          <div className='flex items-center justify-between'>
+            <div>
+              <p className='text-xs uppercase tracking-wide text-slate-500'>Running right now</p>
+              <h3 className='text-lg font-semibold text-slate-900'>Clawgent live snapshot</h3>
+            </div>
+            <span className='pill outline text-xs'>Auto-fetch</span>
+          </div>
+          <div className='mt-3 text-sm text-slate-700'>
+            {loadingStatuses ? 'Loading…' : null}
+            {!loadingStatuses && statuses.length === 0 ? 'No agents detected (demo fallback).' : null}
+            {!loadingStatuses && statuses.length > 0 ? (
+              <ul className='mt-2 space-y-1'>
+                {statuses.map((s, i) => (
+                  <li key={i} className='flex items-center gap-2 rounded-xl bg-slate-50 px-3 py-2'>
+                    <span className='h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.6)]' />
+                    <span>{s}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
         </div>
       </main>
     </div>
