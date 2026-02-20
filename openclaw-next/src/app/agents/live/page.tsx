@@ -2,6 +2,19 @@
 
 import { useEffect, useState } from 'react'
 
+type HistoryItem = {
+  agent: string
+  event: string
+  status: 'running' | 'queued' | 'done'
+  at?: string
+}
+
+type ChatItem = {
+  from: string
+  text: string
+  at?: string
+}
+
 const working = [
   {
     name: 'Amber Scout',
@@ -32,7 +45,7 @@ const working = [
   }
 ]
 
-const historySeeds = [
+const historySeeds: HistoryItem[] = [
   { agent: 'Amber Scout', event: 'Synced 42 leads to CRM', status: 'done' },
   { agent: 'Rose Writer', event: 'Published outreach v2', status: 'done' },
   { agent: 'Cyan Surfer', event: 'Pinned 6 citations', status: 'done' },
@@ -40,7 +53,7 @@ const historySeeds = [
   { agent: 'Rose Writer', event: 'Tone-checking drafts', status: 'running' }
 ]
 
-const chatSeeds = [
+const chatSeeds: ChatItem[] = [
   { from: 'Amber Scout', text: 'Passing fresh ICP shortlist your way.' },
   { from: 'Rose Writer', text: 'Got it—will weave personas into copy.' },
   { from: 'Cyan Surfer', text: 'Link bundle ready if you need citations.' }
@@ -48,8 +61,8 @@ const chatSeeds = [
 
 export default function LiveAgents() {
   const [tick, setTick] = useState(0)
-  const [history, setHistory] = useState(historySeeds)
-  const [chat, setChat] = useState(chatSeeds)
+  const [history, setHistory] = useState<HistoryItem[]>(historySeeds)
+  const [chat, setChat] = useState<ChatItem[]>(chatSeeds)
 
   useEffect(() => {
     const id = setInterval(() => setTick(t => t + 1), 2200)
